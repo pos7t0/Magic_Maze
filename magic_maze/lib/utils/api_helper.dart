@@ -38,4 +38,24 @@ class MagicApiHelper {
           'Failed to load cards by name. Status code: ${response.statusCode}');
     }
   }
+
+  // Método para obtener cartas aleatorias
+  Future<List<MagicCard>> fetchRandomCards({required int count}) async {
+    if (count < 60 || count > 100) {
+      throw Exception('The number of cards must be between 60 and 100.');
+    }
+
+    final url = Uri.parse('$baseUrl/cards?random=true&pageSize=$count');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> cardList = data['cards'];
+
+      return cardList.map((json) => MagicCard.fromJson(json)).toList();
+    } else {
+      throw Exception(
+          'Failed to load random cards. Status code: ${response.statusCode}');
+    }
+  }
 }
