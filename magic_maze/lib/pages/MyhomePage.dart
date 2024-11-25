@@ -28,10 +28,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // Método que se ejecuta al presionar el botón para obtener las cartas
-  void _fetchCards() async {
+  // Método que se ejecuta al presionar el botón para obtener cartas aleatorias
+  void _fetchRandomCards() async {
     try {
-      List<MagicCard> cards = await apiHelper.fetchCards();
+      // Solicitar un número aleatorio de cartas dentro del rango permitido
+      const int randomCount = 60; // Cambiar a cualquier valor entre 60 y 100
+      List<MagicCard> cards =
+          await apiHelper.fetchRandomCards(count: randomCount);
       setState(() {
         _cards = cards;
       });
@@ -55,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed:
-                  _fetchCards, // Llamar al método cuando se presiona el botón
+                  _fetchRandomCards, // Llamar al método cuando se presiona el botón
               child: const Text('Obtener Cartas'),
             ),
             // Mostrar las cartas obtenidas (si las hay)
