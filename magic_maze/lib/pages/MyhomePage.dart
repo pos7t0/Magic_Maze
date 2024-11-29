@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:magic_maze/pages/randomDeckPage.dart';
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -34,13 +36,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.house_outlined),
+        items: <BottomNavigationBarItem>[
+           BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+                  'assets/icons/Prueba.svg',
+                  
+                  semanticsLabel: 'user Logo',
+                  width: 20,
+                ),
             label: 'Casa',
-            backgroundColor: Color.fromARGB(255, 168, 71, 36),
+            backgroundColor: const Color.fromARGB(255, 168, 71, 36),
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.house_outlined),
             label: 'Casa',
             backgroundColor: Color.fromARGB(255, 168, 71, 36),
