@@ -39,11 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
         items: <BottomNavigationBarItem>[
            BottomNavigationBarItem(
             icon: SvgPicture.asset(
-                  'assets/icons/Prueba.svg',
-                  
-                  semanticsLabel: 'user Logo',
-                  width: 20,
-                ),
+              'assets/icons/Prueba.svg',
+              color: _selectedIndex == 0
+                  ? Colors.black // Color cuando está seleccionado
+                  : Colors.grey, // Color cuando no está seleccionado
+              semanticsLabel: 'User Logo',
+              width: 30,
+            ),
             label: 'Casa',
             backgroundColor: const Color.fromARGB(255, 168, 71, 36),
           ),

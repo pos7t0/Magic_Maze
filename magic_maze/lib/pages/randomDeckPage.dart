@@ -52,7 +52,29 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
               },
             ),
           // Botón en la parte inferior central
-          
+          Card(
+  child: Container(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Colors.blue, Colors.blue], // Mezcla de azul y transparencia
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
+    child: Column(
+      children: [
+        Container(
+          color: Colors.red.withOpacity(0.5), // Capa sólida adicional
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Combinación de colores',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
           Positioned(
             bottom: 20,
             left: 0,
