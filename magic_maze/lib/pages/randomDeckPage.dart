@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/utils/api_helper.dart';
+import 'package:magic_maze/utils/database_helper.dart';
 
 class RandomDeckPage extends StatefulWidget {
-  const RandomDeckPage({Key? key}) : super(key: key);
+  const RandomDeckPage({super.key});
 
   @override
   State<RandomDeckPage> createState() => _RandomDeckPageState();
@@ -11,7 +12,9 @@ class RandomDeckPage extends StatefulWidget {
 
 class _RandomDeckPageState extends State<RandomDeckPage> {
   final MagicApiHelper apiHelper = MagicApiHelper();
+  final DatabaseHelper dbHelper = DatabaseHelper();
   List<MagicCard> _cards = [];
+  int? _deckId; // ID del mazo creado o seleccionado
 
   // Método para obtener cartas aleatorias
   void _fetchRandomCards() async {
@@ -28,6 +31,30 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
         SnackBar(content: Text('Error al cargar cartas: $e')),
       );
     }
+  }
+
+  // Método para crear un mazo y guardar las cartas
+  void _saveDeck() async {
+    if (_cards.isEmpty) return;
+
+    // Crear el mazo
+    final deckName = 'Mazo Aleatorio ${DateTime.now().toIso8601String()}';
+    final deckId = await dbHelper.createDeck(deckName);
+
+    // Guardar todas las cartas en el mazo
+    for (var card in _cards) {
+      await dbHelper.addCardToDeck(deckId, card.id, card.name,
+          1); // Puedes ajustar la cantidad si lo necesitas
+    }
+
+    setState(() {
+      _deckId = deckId; // Guardar el ID del mazo creado
+    });
+
+    // Mensaje de éxito
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Mazo guardado exitosamente!')),
+    );
   }
 
   @override
@@ -51,32 +78,9 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
                 );
               },
             ),
-          // Botón en la parte inferior central
-          Card(
-  child: Container(
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [Colors.blue, Colors.blue], // Mezcla de azul y transparencia
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    ),
-    child: Column(
-      children: [
-        Container(
-          color: Colors.red.withOpacity(0.5), // Capa sólida adicional
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Combinación de colores',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ],
-    ),
-  ),
-),
+          // Botón para obtener cartas
           Positioned(
-            bottom: 20,
+            bottom: 80,
             left: 0,
             right: 0,
             child: Center(
@@ -86,6 +90,19 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
               ),
             ),
           ),
+          // Botón para guardar las cartas en un mazo, solo si hay cartas
+          if (_cards.isNotEmpty)
+            Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: _saveDeck,
+                  child: const Text('Guardar Mazo'),
+                ),
+              ),
+            ),
         ],
       ),
     );

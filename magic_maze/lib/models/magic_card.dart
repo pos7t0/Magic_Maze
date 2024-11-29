@@ -38,4 +38,18 @@ class MagicCard {
       imageUrl: json['imageUrl'] ?? '',
     );
   }
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+      'rarity': rarity,
+      'text': text,
+      'manaCost': manaCost,
+      'colors': colors.join(','), // Convertir lista a string
+      'power': power,
+      'toughness': toughness,
+      'imageUrl': imageUrl,
+    };
+  }
 }
