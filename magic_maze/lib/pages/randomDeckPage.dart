@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
+import 'package:magic_maze/pages/infoCard.dart';
 import 'package:magic_maze/utils/api_helper.dart';
 import 'package:magic_maze/utils/database_helper.dart';
 
@@ -68,16 +69,52 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
           // Lista de cartas
           if (_cards.isNotEmpty)
             ListView.builder(
-              itemCount: _cards.length,
-              padding: const EdgeInsets.only(bottom: 80),
-              itemBuilder: (context, index) {
-                var card = _cards[index];
-                return ListTile(
-                  title: Text(card.name),
-                  subtitle: Text(card.type),
-                );
-              },
+  itemCount: _cards.length,
+  padding: const EdgeInsets.only(bottom: 80),
+  itemBuilder: (context, index) {
+    var card = _cards[index];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 5,
+        child: InkWell(
+          onTap: () {
+            // Navegar a la página de información
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => InfoCard(card: card),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  card.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  card.type,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
+    );
+  },
+),
           // Botón para obtener cartas
           Positioned(
             bottom: 80,
