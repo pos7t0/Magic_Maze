@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:magic_maze/pages/decks.dart';
 import 'package:magic_maze/pages/randomDeckPage.dart';
 
 
@@ -19,7 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Lista de las páginas que quieres mostrar
   static const List<Widget> _pages = <Widget>[
     RandomDeckPage(),
-    RandomDeckPage(),
+    DecksPage(),
   ];
 
   void _onItemTapped(int index) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magic_maze/pages/infoCard.dart';
 import 'package:magic_maze/utils/database_helper.dart';
 import 'package:magic_maze/models/magic_card.dart';
 
@@ -75,7 +76,12 @@ class _DecksPageState extends State<DecksPage> {
                             trailing: IconButton(
                               icon: const Icon(Icons.arrow_forward),
                               onPressed: () {
-                                // Aquí se manejará la navegación a otra pantalla en el futuro
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => InfoCard(card: card),
+                                  ),
+                                );
                               },
                             ),
                           ),
