@@ -64,7 +64,6 @@ class _DecksPageState extends State<DecksPage> {
                     }
 
                     final cards = snapshot.data!;
-
                     return Column(
                       children: cards.map((card) {
                         return Card(
