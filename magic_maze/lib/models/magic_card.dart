@@ -26,18 +26,20 @@ class MagicCard {
   // Método para convertir la respuesta JSON en un objeto MagicCard
   factory MagicCard.fromJson(Map<String, dynamic> json) {
     return MagicCard(
-      id: json["id"] ?? '',
+      id: json["id"]?.toString() ?? '', // Convertir explícitamente a String
       name: json['name'] ?? '',
       type: json['type'] ?? '',
       rarity: json['rarity'] ?? '',
       text: json['text'] ?? '',
       manaCost: json["manaCost"] ?? '',
-      colors: List<String>.from(json["colors"] ?? []), // Manejo como lista
-      power: int.tryParse(json["power"] ?? '0') ?? 0,
-      toughness: int.tryParse(json["toughness"] ?? '0') ?? 0,
+      colors:
+          _parseColors(json["colors"]), // Llama al método para procesar colors
+      power: int.tryParse(json["power"]?.toString() ?? '0') ?? 0,
+      toughness: int.tryParse(json["toughness"]?.toString() ?? '0') ?? 0,
       imageUrl: json['imageUrl'] ?? '',
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -51,5 +53,19 @@ class MagicCard {
       'toughness': toughness,
       'imageUrl': imageUrl,
     };
+  }
+
+  // Método para procesar el campo colors
+  static List<String> _parseColors(dynamic colorsField) {
+    if (colorsField == null) {
+      return [];
+    }
+    if (colorsField is String) {
+      return colorsField.split(',').map((color) => color.trim()).toList();
+    }
+    if (colorsField is Iterable) {
+      return List<String>.from(colorsField);
+    }
+    throw TypeError();
   }
 }

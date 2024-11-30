@@ -15,47 +15,78 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   final MagicApiHelper apiHelper = MagicApiHelper();
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<MagicCard> _cards = [];
-  int? _deckId; // ID del mazo creado o seleccionado
+  int? _deckId;
 
-  // Método para obtener cartas aleatorias
   void _fetchRandomCards() async {
     try {
-      const int randomCount = 60; // Número de cartas a obtener
+      const int randomCount = 60;
       List<MagicCard> cards =
           await apiHelper.fetchRandomCards(count: randomCount);
       setState(() {
         _cards = cards;
       });
     } catch (e) {
-      // Mostrar un mensaje en caso de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar cartas: $e')),
       );
     }
   }
 
-  // Método para crear un mazo y guardar las cartas
   void _saveDeck() async {
     if (_cards.isEmpty) return;
 
-    // Crear el mazo
-    final deckName = 'Mazo Aleatorio ${DateTime.now().toIso8601String()}';
-    final deckId = await dbHelper.createDeck(deckName);
+    String deckName = 'Mazo aleatorio ${DateTime.now().toIso8601String()}';
+    int deckId = await dbHelper.insertDeck(deckName);
 
-    // Guardar todas las cartas en el mazo
     for (var card in _cards) {
-      await dbHelper.addCardToDeck(deckId, card.id, card.name,
-          1); // Puedes ajustar la cantidad si lo necesitas
+      await dbHelper.insertCard(deckId, card);
     }
 
-    setState(() {
-      _deckId = deckId; // Guardar el ID del mazo creado
-    });
-
-    // Mensaje de éxito
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Mazo guardado exitosamente!')),
+      const SnackBar(content: Text('Mazo guardado con Ã©xito!')),
     );
+  }
+
+  Decoration _getCardBackground(List<String> colors) {
+    if (colors.isEmpty) {
+      return const BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      );
+    }
+
+    if (colors.length == 1) {
+      return BoxDecoration(
+        color: _getColor(colors[0]),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      );
+    }
+
+    return BoxDecoration(
+      gradient: LinearGradient(
+        colors: colors.map(_getColor).toList(),
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderRadius: const BorderRadius.all(Radius.circular(10)),
+    );
+  }
+
+  Color _getColor(String colorInitial) {
+    switch (colorInitial.toLowerCase()) {
+      case 'w':
+        return Color.fromARGB(255, 255, 255, 185);
+      case 'u':
+        return Colors.blue;
+      case 'b':
+        return Colors.black;
+      case 'r':
+        return Colors.red;
+      case 'g':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
   @override
@@ -66,56 +97,64 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
       ),
       body: Stack(
         children: [
-          // Lista de cartas
           if (_cards.isNotEmpty)
             ListView.builder(
-  itemCount: _cards.length,
-  padding: const EdgeInsets.only(bottom: 80),
-  itemBuilder: (context, index) {
-    var card = _cards[index];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 5,
-        child: InkWell(
-          onTap: () {
-            // Navegar a la página de información
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => InfoCard(card: card),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  card.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+              itemCount: _cards.length,
+              padding: const EdgeInsets.only(bottom: 80),
+              itemBuilder: (context, index) {
+                var card = _cards[index];
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Container(
+                    decoration: _getCardBackground(card.colors),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 5,
+                        color: Colors.white, // Fondo neutro
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => InfoCard(card: card),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  card.name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  card.type,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  card.type,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
+                );
+              },
             ),
-          ),
-        ),
-      ),
-    );
-  },
-),
-          // Botón para obtener cartas
           Positioned(
             bottom: 80,
             left: 0,
@@ -127,7 +166,6 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
               ),
             ),
           ),
-          // Botón para guardar las cartas en un mazo, solo si hay cartas
           if (_cards.isNotEmpty)
             Positioned(
               bottom: 20,
