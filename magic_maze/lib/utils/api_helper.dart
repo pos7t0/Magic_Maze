@@ -21,11 +21,13 @@ class MagicApiHelper {
     }
   }
 
-  // Método para buscar cartas por nombre
-  Future<List<MagicCard>> searchCardsByName(String name,
-      {int page = 1, int pageSize = 100}) async {
-    final url =
-        Uri.parse('$baseUrl/cards?name=$name&page=$page&pageSize=$pageSize');
+// Método para buscar cartas por nombre
+  Future<List<MagicCard>> fetchCardsByName(String name,
+      {bool exactMatch = false}) async {
+    // Si exactMatch es verdadero, encierra el nombre entre comillas
+    final formattedName = exactMatch ? '"$name"' : name;
+
+    final url = Uri.parse('${baseUrl}cards?name=$formattedName');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -35,7 +37,7 @@ class MagicApiHelper {
       return cardList.map((json) => MagicCard.fromJson(json)).toList();
     } else {
       throw Exception(
-          'Failed to load cards by name. Status code: ${response.statusCode}');
+          'Failed to fetch cards by name. Status code: ${response.statusCode}');
     }
   }
 
