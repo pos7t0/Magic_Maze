@@ -14,7 +14,6 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   final MagicApiHelper apiHelper = MagicApiHelper();
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<MagicCard> _cards = [];
-  int? _deckId; // ID del mazo creado o seleccionado
 
   // Método para obtener cartas aleatorias
   void _fetchRandomCards() async {
@@ -37,23 +36,18 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   void _saveDeck() async {
     if (_cards.isEmpty) return;
 
-    // Crear el mazo
-    final deckName = 'Mazo Aleatorio ${DateTime.now().toIso8601String()}';
-    final deckId = await dbHelper.createDeck(deckName);
+    // Crear un nuevo mazo
+    String deckName = 'Mazo aleatorio ${DateTime.now().toIso8601String()}';
+    int deckId = await dbHelper.insertDeck(deckName);
 
-    // Guardar todas las cartas en el mazo
+    // Guardar las cartas en el mazo
     for (var card in _cards) {
-      await dbHelper.addCardToDeck(deckId, card.id, card.name,
-          1); // Puedes ajustar la cantidad si lo necesitas
+      await dbHelper.insertCard(deckId, card);
     }
 
-    setState(() {
-      _deckId = deckId; // Guardar el ID del mazo creado
-    });
-
-    // Mensaje de éxito
+    // Mostrar mensaje de éxito
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Mazo guardado exitosamente!')),
+      const SnackBar(content: Text('Mazo guardado con éxito!')),
     );
   }
 

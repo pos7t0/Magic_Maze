@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:magic_maze/pages/randomDeckPage.dart';
-
-
+import 'package:magic_maze/pages/decks.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -19,7 +18,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Lista de las páginas que quieres mostrar
   static const List<Widget> _pages = <Widget>[
     RandomDeckPage(),
-    RandomDeckPage(),
+    DecksPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -37,13 +36,12 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         items: <BottomNavigationBarItem>[
-           BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: SvgPicture.asset(
-                  'assets/icons/Prueba.svg',
-                  
-                  semanticsLabel: 'user Logo',
-                  width: 20,
-                ),
+              'assets/icons/Prueba.svg',
+              semanticsLabel: 'user Logo',
+              width: 20,
+            ),
             label: 'Casa',
             backgroundColor: const Color.fromARGB(255, 168, 71, 36),
           ),
