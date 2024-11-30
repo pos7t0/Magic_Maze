@@ -68,6 +68,10 @@ flutter:
   assets:
      - assets/images/Logo.png
      - assets/icons/Prueba.svg
+     - assets/icons/BarajaRandom.svg
+     - assets/icons/CardRandom.svg
+     - assets/icons/CardSave.svg
+     - assets/icons/Save.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

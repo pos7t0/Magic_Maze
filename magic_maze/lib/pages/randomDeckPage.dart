@@ -91,9 +91,16 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Cartas'),
-      ),
+  appBar: AppBar(
+    title: const Text('Lista de Cartas'),
+    backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
+    titleTextStyle: const TextStyle(
+      color: Colors.white, // Cambia el color del texto del título
+      fontSize: 20,        // Opcional: Ajusta el tamaño de la fuente
+      fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
+    ),
+  ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: Stack(
         children: [
           if (_cards.isNotEmpty)
