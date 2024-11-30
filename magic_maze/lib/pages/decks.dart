@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magic_maze/pages/add_deck.dart';
 import 'package:magic_maze/pages/infoCard.dart';
+import 'package:magic_maze/pages/modify_deck.dart';
 import 'package:magic_maze/utils/database_helper.dart';
 import 'package:magic_maze/models/magic_card.dart';
 
@@ -34,6 +35,13 @@ class _DecksPageState extends State<DecksPage> {
     return await dbHelper.getCardsByDeckId(deckId);
   }
 
+  // Eliminar un mazo y sus cartas
+  Future<void> _deleteDeck(int deckId) async {
+    await dbHelper.removeCardsFromDeck(deckId); // Borrar cartas asociadas
+    await dbHelper.removeDeck(deckId); // Borrar el mazo
+    _loadDecks(); // Recargar la lista de mazos
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +58,66 @@ class _DecksPageState extends State<DecksPage> {
           return Card(
             margin: const EdgeInsets.all(10),
             child: ExpansionTile(
-              title: Text(deckName),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(deckName),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditDeckPage(
+                                deckId: deckId,
+                                deckName: deckName,
+                              ),
+                            ),
+                          ).then((_) {
+                            _loadDecks(); // Recargar los mazos al volver
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () async {
+                          final confirmDelete = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Eliminar Mazo'),
+                                content: const Text(
+                                    '¿Estás seguro de que deseas eliminar este mazo y todas sus cartas?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, false);
+                                    },
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, true);
+                                    },
+                                    child: const Text('Eliminar'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (confirmDelete == true) {
+                            await _deleteDeck(deckId);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
               children: [
                 FutureBuilder<List<MagicCard>>(
                   future: _getCardsForDeck(deckId),
@@ -67,27 +134,32 @@ class _DecksPageState extends State<DecksPage> {
 
                     final cards = snapshot.data!;
                     return Column(
-                      children: cards.map((card) {
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 8),
-                          child: ListTile(
-                            title: Text(card.name),
-                            subtitle: Text(card.type),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.arrow_forward),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => InfoCard(card: card),
-                                  ),
-                                );
-                              },
+                      children: [
+                        ...cards.map((card) {
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 8),
+                            child: ListTile(
+                              title: Text(card.name),
+                              subtitle: Text(card.type),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.arrow_forward),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          InfoCard(card: card),
+                                    ),
+                                  ).then((_) {
+                                    _loadDecks(); // Recargar los mazos al volver
+                                  });
+                                },
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }),
+                      ],
                     );
                   },
                 ),
@@ -103,8 +175,10 @@ class _DecksPageState extends State<DecksPage> {
             MaterialPageRoute(
               builder: (context) => const CreateDeckPage(),
             ),
-          );
-        }, // Ícono del botón
+          ).then((_) {
+            _loadDecks(); // Recargar los mazos al volver
+          });
+        },
         tooltip: 'Crear nuevo mazo',
         child: const Icon(Icons.add),
       ),

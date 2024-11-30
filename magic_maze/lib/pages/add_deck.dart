@@ -91,7 +91,16 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear Mazo')),
+      appBar: AppBar(
+        title: const Text('Crear Mazo'),
+        actions: [
+          if (_isDeckCreated)
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _addCardsToDeck, // Acción al presionar el ícono
+            ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -178,12 +187,6 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       );
                     },
                   ),
-                ),
-                const SizedBox(height: 16),
-                // Botón para guardar las cartas en el mazo
-                ElevatedButton(
-                  onPressed: _addCardsToDeck,
-                  child: const Text('Guardar Cartas'),
                 ),
               ],
             ],
