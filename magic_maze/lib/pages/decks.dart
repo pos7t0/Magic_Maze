@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magic_maze/pages/add_deck.dart';
 import 'package:magic_maze/pages/infoCard.dart';
 import 'package:magic_maze/utils/database_helper.dart';
 import 'package:magic_maze/models/magic_card.dart';
@@ -94,6 +95,18 @@ class _DecksPageState extends State<DecksPage> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CreateDeckPage(),
+                                  ),
+                                );
+        },
+        child: const Icon(Icons.add), // Ícono del botón
+        tooltip: 'Crear nuevo mazo',
       ),
     );
   }

@@ -68,10 +68,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     for (var card in _selectedCards) {
       await _databaseHelper.insertCard(_deckId, card);
     }
-
+    
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Cartas agregadas al mazo!'),
     ));
+    Navigator.pop(context);
   }
 
   // Método para mostrar la imagen de la carta
