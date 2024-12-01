@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.magic_maze"
+        applicationId = "com.magic_maze"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -32,8 +32,15 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+             // Personaliza el nombre del archivo APK
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    // Asegúrate de cambiar el nombre del APK
+                    if (variant.buildType.name == "release") {
+                        output.outputFileName = "Magic_Maze.apk"
+                    }
+                }
+            }
             signingConfig = signingConfigs.debug
         }
     }
