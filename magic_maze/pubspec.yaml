@@ -72,6 +72,8 @@ flutter:
      - assets/icons/CardRandom.svg
      - assets/icons/CardSave.svg
      - assets/icons/Save.svg
+     - assets/icons/About.svg
+     - assets/icons/Management.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

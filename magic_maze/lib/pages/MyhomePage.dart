@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:magic_maze/pages/aboutPage.dart';
 import 'package:magic_maze/pages/decks.dart';
 import 'package:magic_maze/pages/randomDeckPage.dart';
 
@@ -19,6 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<Widget> _pages = <Widget>[
     RandomDeckPage(),
     DecksPage(),
+    AboutPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -39,7 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
               'assets/icons/CardRandom.svg',
-              semanticsLabel: 'Random Deck',
               width: 30,
               color: _selectedIndex == 0
                   ? Colors.white// Blanco para seleccionado
@@ -51,13 +52,23 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
               'assets/icons/Save.svg',
-              semanticsLabel: 'Save Deck',
               width: 30,
               color: _selectedIndex == 1
                   ? Colors.white // Blanco para seleccionado
                   : const Color.fromARGB(255, 2, 124, 224), // Azul para no seleccionado
             ),
             label: 'Saved Decks',
+            backgroundColor: const Color.fromARGB(255, 11, 34, 63),
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              'assets/icons/About.svg',
+              width: 25,
+              color: _selectedIndex == 2
+                  ? Colors.white // Blanco para seleccionado
+                  : const Color.fromARGB(255, 2, 124, 224), // Azul para no seleccionado
+            ),
+            label: 'About',
             backgroundColor: const Color.fromARGB(255, 11, 34, 63),
           ),
         ],

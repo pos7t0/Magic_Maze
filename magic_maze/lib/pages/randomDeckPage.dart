@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/pages/infoCard.dart';
@@ -15,16 +18,35 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   final MagicApiHelper apiHelper = MagicApiHelper();
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<MagicCard> _cards = [];
-  int? _deckId;
+  //int? _deckId;
 
   void _fetchRandomCards() async {
+    // Verificar conectividad
+    List<ConnectivityResult> connectivityResult =
+        await Connectivity().checkConnectivity();
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('No hay conexión a internet. Por favor, verifica tu red.'),
+        ),
+      );
+      return; // Salir del método si no hay conexión
+    }
+
     try {
-      const int randomCount = 60;
+      const int randomCount = 60; // Cantidad de cartas a obtener
       List<MagicCard> cards =
           await apiHelper.fetchRandomCards(count: randomCount);
+
       setState(() {
         _cards = cards;
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cartas cargadas con éxito.')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar cartas: $e')),
@@ -75,7 +97,7 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   Color _getColor(String colorInitial) {
     switch (colorInitial.toLowerCase()) {
       case 'w':
-        return Color.fromARGB(255, 255, 255, 185);
+        return const Color.fromARGB(255, 255, 255, 185);
       case 'u':
         return Colors.blue;
       case 'b':
@@ -93,20 +115,20 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-    title: const Text('Lista de Cartas'),
-    backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
-    titleTextStyle: const TextStyle(
-      color: Colors.white, // Cambia el color del texto del título
-      fontSize: 20,        // Opcional: Ajusta el tamaño de la fuente
-      fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
-    ),
-    iconTheme: const IconThemeData(
+        title: const Text('Lista de Cartas'),
+        backgroundColor:
+            const Color.fromARGB(255, 11, 34, 63), // Color de fondo
+        titleTextStyle: const TextStyle(
+          color: Colors.white, // Cambia el color del texto del título
+          fontSize: 20, // Opcional: Ajusta el tamaño de la fuente
+          fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
+        ),
+        iconTheme: const IconThemeData(
           color: Colors.white, // Cambia el color de la flecha a blanco
         ),
-  ),
-  backgroundColor: const Color.fromARGB(255, 15, 50, 92),
+      ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: Stack(
-        
         children: [
           if (_cards.isNotEmpty)
             ListView.builder(
