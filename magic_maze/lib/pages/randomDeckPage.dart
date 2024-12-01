@@ -18,22 +18,22 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   final MagicApiHelper apiHelper = MagicApiHelper();
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<MagicCard> _cards = [];
-  //int? _deckId;
+  bool _noConnection = false;
 
   void _fetchRandomCards() async {
     // Verificar conectividad
-    List<ConnectivityResult> connectivityResult =
-        await Connectivity().checkConnectivity();
+    var connectivityResult = await Connectivity().checkConnectivity();
 
     if (connectivityResult.contains(ConnectivityResult.none)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('No hay conexión a internet. Por favor, verifica tu red.'),
-        ),
-      );
+      setState(() {
+        _noConnection = true;
+      });
       return; // Salir del método si no hay conexión
     }
+
+    setState(() {
+      _noConnection = false;
+    });
 
     try {
       const int randomCount = 60; // Cantidad de cartas a obtener
@@ -43,10 +43,6 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
       setState(() {
         _cards = cards;
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cartas cargadas con éxito.')),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar cartas: $e')),
@@ -65,7 +61,7 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mazo guardado con Ã©xito!')),
+      const SnackBar(content: Text('Mazo guardado con éxito!')),
     );
   }
 
@@ -116,103 +112,125 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de Cartas'),
-        backgroundColor:
-            const Color.fromARGB(255, 11, 34, 63), // Color de fondo
+        backgroundColor: const Color.fromARGB(255, 11, 34, 63),
         titleTextStyle: const TextStyle(
-          color: Colors.white, // Cambia el color del texto del título
-          fontSize: 20, // Opcional: Ajusta el tamaño de la fuente
-          fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.white, // Cambia el color de la flecha a blanco
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: const Color.fromARGB(255, 15, 50, 92),
-      body: Stack(
-        children: [
-          if (_cards.isNotEmpty)
-            ListView.builder(
-              itemCount: _cards.length,
-              padding: const EdgeInsets.only(bottom: 80),
-              itemBuilder: (context, index) {
-                var card = _cards[index];
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Container(
-                    decoration: _getCardBackground(card.colors),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 5,
-                        color: Colors.white, // Fondo neutro
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => InfoCard(card: card),
-                              ),
-                            );
-                          },
+      body: _noConnection
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.signal_wifi_off,
+                    size: 100,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No hay conexión a internet',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _fetchRandomCards,
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            )
+          : Stack(
+              children: [
+                if (_cards.isNotEmpty)
+                  ListView.builder(
+                    itemCount: _cards.length,
+                    padding: const EdgeInsets.only(bottom: 80),
+                    itemBuilder: (context, index) {
+                      var card = _cards[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Container(
+                          decoration: _getCardBackground(card.colors),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  card.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 5,
+                              color: Colors.white,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          InfoCard(card: card),
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        card.name,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        card.type,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  card.type,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+                Positioned(
+                  bottom: 80,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: _fetchRandomCards,
+                      child: const Text('Obtener Cartas'),
+                    ),
+                  ),
+                ),
+                if (_cards.isNotEmpty)
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: _saveDeck,
+                        child: const Text('Guardar Mazo'),
                       ),
                     ),
                   ),
-                );
-              },
+              ],
             ),
-          Positioned(
-            bottom: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: _fetchRandomCards,
-                child: const Text('Obtener Cartas'),
-              ),
-            ),
-          ),
-          if (_cards.isNotEmpty)
-            Positioned(
-              bottom: 20,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: _saveDeck,
-                  child: const Text('Guardar Mazo'),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }
