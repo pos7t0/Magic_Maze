@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/utils/api_helper.dart';
@@ -18,14 +19,29 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   bool _isDeckCreated = false;
   bool _isLoading = false;
   List<MagicCard> _searchedCards = [];
-  List<MagicCard> _selectedCards = [];
+  final List<MagicCard> _selectedCards = [];
   late int _deckId;
+  bool _isNoConnection = false;
 
   final MagicApiHelper _apiHelper = MagicApiHelper();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   // Método para buscar cartas
   void _searchCards() async {
+    // Verificar conectividad
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      setState(() {
+        _isNoConnection = true;
+      });
+      return; // Salir del método si no hay conexión
+    } else {
+      setState(() {
+        _isNoConnection = false;
+      });
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -40,7 +56,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         _searchedCards = [];
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error al buscar cartas: $e',),
+        content: Text('Error al buscar cartas: $e'),
       ));
     } finally {
       setState(() {
@@ -82,7 +98,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       height: 50,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.broken_image, size: 50, color: Colors.white,);
+        return const Icon(
+          Icons.broken_image,
+          size: 50,
+          color: Colors.white,
+        );
       },
     );
   }
@@ -91,7 +111,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Cartas', style: TextStyle(color: Colors.white)), // Título en blanco
+        title: const Text('Lista de Cartas',
+            style: TextStyle(color: Colors.white)), // Título en blanco
         backgroundColor: const Color.fromARGB(255, 11, 34, 63),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -101,7 +122,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         actions: [
           if (_isDeckCreated)
             IconButton(
-              icon: const Icon(Icons.save, color: Colors.white), // Icono en blanco
+              icon: const Icon(Icons.save,
+                  color: Colors.white), // Icono en blanco
               onPressed: _addCardsToDeck,
             ),
         ],
@@ -120,15 +142,19 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                 // Input para el nombre del mazo
                 TextField(
                   controller: _deckNameController,
-                  style: const TextStyle(color: Colors.white), // Texto en blanco
+                  style:
+                      const TextStyle(color: Colors.white), // Texto en blanco
                   decoration: const InputDecoration(
                     labelText: 'Nombre del Mazo',
-                    labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                    labelStyle:
+                        TextStyle(color: Colors.white), // Etiqueta en blanco
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white), // Línea de enfoque blanca
+                      borderSide: BorderSide(
+                          color: Colors.white), // Línea de enfoque blanca
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white), // Línea de borde blanca
+                      borderSide: BorderSide(
+                          color: Colors.white), // Línea de borde blanca
                     ),
                   ),
                 ),
@@ -141,26 +167,41 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                 // Muestra el nombre del mazo creado
                 Text('Mazo: ${_deckNameController.text}',
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
                 const SizedBox(height: 16),
-                // Buscador de cartas con tamaño fijo
-                SizedBox(
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _searchController,
-                    style: const TextStyle(color: Colors.white), // Texto en blanco
-                    decoration: const InputDecoration(
-                      labelText: 'Buscar Carta',
-                      labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white), // Línea de enfoque blanca
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white), // Línea de borde blanca
+                // Buscador de cartas con tamaño fijo y el icono de sin señal al lado
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        style: const TextStyle(
+                            color: Colors.white), // Texto en blanco
+                        decoration: const InputDecoration(
+                          labelText: 'Buscar Carta',
+                          labelStyle: TextStyle(
+                              color: Colors.white), // Etiqueta en blanco
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.white), // Línea de enfoque blanca
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.white), // Línea de borde blanca
+                          ),
+                        ),
+                        onChanged: (_) => _searchCards(),
                       ),
                     ),
-                    onChanged: (_) => _searchCards(),
-                  ),
+                    if (_isNoConnection)
+                      const Icon(
+                        Icons.signal_wifi_off,
+                        color: Colors.white,
+                        size: 30, // Tamaño más pequeño del ícono
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 if (_isLoading) const CircularProgressIndicator(),
@@ -174,10 +215,15 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                         final card = _searchedCards[index];
                         return ListTile(
                           leading: _buildCardImage(card.imageUrl),
-                          title: Text(card.name, style: const TextStyle(color: Colors.white)), // Título en blanco
-                          subtitle: Text(card.type, style: const TextStyle(color: Colors.white)), // Subtítulo en blanco
+                          title: Text(card.name,
+                              style: const TextStyle(
+                                  color: Colors.white)), // Título en blanco
+                          subtitle: Text(card.type,
+                              style: const TextStyle(
+                                  color: Colors.white)), // Subtítulo en blanco
                           trailing: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.white), // Icono en blanco
+                            icon: const Icon(Icons.add,
+                                color: Colors.white), // Icono en blanco
                             onPressed: () {
                               setState(() {
                                 _selectedCards.add(card);
@@ -190,7 +236,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                const Text('Cartas Seleccionadas:', style: TextStyle(color: Colors.white)), // Título en blanco
+                const Text('Cartas Seleccionadas:',
+                    style: TextStyle(color: Colors.white)), // Título en blanco
                 SizedBox(
                   height: 200, // Altura fija para las cartas seleccionadas
                   child: ListView.builder(
@@ -199,10 +246,15 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       final card = _selectedCards[index];
                       return ListTile(
                         leading: _buildCardImage(card.imageUrl),
-                        title: Text(card.name, style: const TextStyle(color: Colors.white)), // Título en blanco
-                        subtitle: Text(card.type, style: const TextStyle(color: Colors.white)), // Subtítulo en blanco
+                        title: Text(card.name,
+                            style: const TextStyle(
+                                color: Colors.white)), // Título en blanco
+                        subtitle: Text(card.type,
+                            style: const TextStyle(
+                                color: Colors.white)), // Subtítulo en blanco
                         trailing: IconButton(
-                          icon: const Icon(Icons.remove, color: Colors.white), // Icono en blanco
+                          icon: const Icon(Icons.remove,
+                              color: Colors.white), // Icono en blanco
                           onPressed: () {
                             setState(() {
                               _selectedCards.remove(card);

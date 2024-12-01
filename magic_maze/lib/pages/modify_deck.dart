@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/utils/database_helper.dart';
@@ -25,6 +28,7 @@ class _EditDeckPageState extends State<EditDeckPage> {
   List<MagicCard> _deckCards = [];
   List<MagicCard> _searchedCards = [];
   bool _isLoading = false;
+  bool _isNoConnection = false; // Variable para verificar la conectividad
 
   @override
   void initState() {
@@ -54,6 +58,20 @@ class _EditDeckPageState extends State<EditDeckPage> {
 
   // Buscar cartas
   void _searchCards(String query) async {
+    // Verificar conectividad
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      setState(() {
+        _isNoConnection = true;
+      });
+      return; // Salir del método si no hay conexión
+    } else {
+      setState(() {
+        _isNoConnection = false;
+      });
+    }
+
     if (query.isEmpty) {
       setState(() {
         _searchedCards = [];
@@ -132,46 +150,64 @@ class _EditDeckPageState extends State<EditDeckPage> {
                 controller: _deckNameController,
                 style: const TextStyle(color: Colors.white), // Texto en blanco
                 decoration: const InputDecoration(
-                  labelText: 'Nombre del mazo',
-                  labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                  labelText: 'Nombre del Mazo',
+                  labelStyle:
+                      TextStyle(color: Colors.white), // Etiqueta en blanco
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(
+                        color: Colors.white), // Línea de enfoque blanca
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(
+                        color: Colors.white), // Línea de borde blanca
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _searchController,
-                style: const TextStyle(color: Colors.white), // Texto en blanco
-                decoration: const InputDecoration(
-                  labelText: 'Buscar cartas',
-                  labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+              // Buscador de cartas con el ícono de sin señal al lado
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Buscar Carta',
+                        labelStyle: TextStyle(color: Colors.white),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      onChanged: (query) => _searchCards(query),
+                    ),
                   ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-                onChanged: _searchCards,
+                  if (_isNoConnection)
+                    const Icon(
+                      Icons.signal_wifi_off,
+                      color: Colors.white,
+                      size: 30, // Tamaño más pequeño del ícono
+                    ),
+                ],
               ),
               const SizedBox(height: 16),
               if (_isLoading) const CircularProgressIndicator(),
               if (!_isLoading && _searchedCards.isNotEmpty) ...[
-                const Text('Cartas encontradas:', style: TextStyle(color: Colors.white)),
+                // Lista de cartas encontradas
                 SizedBox(
-                  height: 200,
+                  height: 300,
                   child: ListView.builder(
                     itemCount: _searchedCards.length,
                     itemBuilder: (context, index) {
                       final card = _searchedCards[index];
                       return ListTile(
                         leading: _buildCardImage(card.imageUrl),
-                        title: Text(card.name, style: const TextStyle(color: Colors.white)),
-                        subtitle: Text(card.type, style: const TextStyle(color: Colors.white)),
+                        title: Text(card.name,
+                            style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(card.type,
+                            style: const TextStyle(color: Colors.white)),
                         trailing: IconButton(
                           icon: const Icon(Icons.add, color: Colors.white),
                           onPressed: () => _addCardToDeck(card),
@@ -182,20 +218,22 @@ class _EditDeckPageState extends State<EditDeckPage> {
                 ),
               ],
               const SizedBox(height: 16),
-              const Divider(color: Colors.white), // Separador en blanco
-              const Text('Cartas en el mazo:', style: TextStyle(color: Colors.white)),
+              const Text('Cartas en el Mazo:',
+                  style: TextStyle(color: Colors.white)),
               SizedBox(
-                height: 300,
+                height: 200,
                 child: ListView.builder(
                   itemCount: _deckCards.length,
                   itemBuilder: (context, index) {
                     final card = _deckCards[index];
                     return ListTile(
                       leading: _buildCardImage(card.imageUrl),
-                      title: Text(card.name, style: const TextStyle(color: Colors.white)),
-                      subtitle: Text(card.type, style: const TextStyle(color: Colors.white)),
+                      title: Text(card.name,
+                          style: const TextStyle(color: Colors.white)),
+                      subtitle: Text(card.type,
+                          style: const TextStyle(color: Colors.white)),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.white),
+                        icon: const Icon(Icons.remove, color: Colors.white),
                         onPressed: () => _removeCardFromDeck(card),
                       ),
                     );
