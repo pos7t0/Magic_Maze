@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
@@ -281,7 +283,7 @@ Imagen: ${card.imageUrl}
                     },
                   ),
                 Positioned(
-                  bottom: 80,
+                  bottom: 20,
                   left: 0,
                   right: 0,
                   child: Center(
