@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';  // Importa el paquete de compartir
 import 'package:magic_maze/pages/add_deck.dart';
 import 'package:magic_maze/pages/infoCard.dart';
 import 'package:magic_maze/pages/modify_deck.dart';
@@ -32,7 +33,51 @@ class _DecksPageState extends State<DecksPage> {
 
   // Obtener las cartas de un mazo
   Future<List<MagicCard>> _getCardsForDeck(int deckId) async {
-    return await dbHelper.getCardsByDeckId(deckId);
+    final cards = await dbHelper.getCardsByDeckId(deckId);
+    print('Cartas recuperadas para el mazo $deckId: ${cards.length}'); // Depuración
+    return cards;
+  }
+
+  // Función para compartir un mazo completo (solo nombre y tipo de las cartas)
+  void _shareDeck(int deckId, String deckName) async {
+    // Obtener las cartas del mazo
+    List<MagicCard> cards = await _getCardsForDeck(deckId);
+
+    // Crear el texto de compartir con el nombre del mazo
+    String deckInfo = 'Mazo: $deckName\n\n';
+
+    // Recorrer las cartas del mazo y agregar solo nombre y tipo
+    for (var card in cards) {
+      deckInfo += '''
+Carta: ${card.name}
+
+----------------------------
+''';
+    }
+
+    // Usar la librería share_plus para compartir el texto del mazo
+    Share.share(deckInfo);
+  }
+
+  // Nueva función para compartir los detalles de una carta
+  void _shareCardDetails(MagicCard card) {
+    // Crear el texto de compartir con los detalles de la carta
+    // Crear un texto detallado para compartir
+  final String cardInfo = '''
+Carta: ${card.name}
+Tipo: ${card.type}
+Rareza: ${card.rarity}
+Coste de Maná: ${card.manaCost}
+Colores: ${card.colors.join(', ')}
+Poder: ${card.power}
+Resistencia: ${card.toughness}
+Texto: ${card.text}
+
+Imagen: ${card.imageUrl}
+''';
+
+  // Usar la librería share_plus para compartir
+  Share.share(cardInfo);
   }
 
   // Eliminar un mazo y sus cartas
@@ -98,7 +143,7 @@ class _DecksPageState extends State<DecksPage> {
           fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 15, 50, 92),  
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: ListView.builder(
         itemCount: _decks.length,
         itemBuilder: (context, index) {
@@ -136,7 +181,7 @@ class _DecksPageState extends State<DecksPage> {
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () async {
-                          final confirmDelete = await showDialog<bool>(
+                          final confirmDelete = await showDialog<bool>( 
                             context: context,
                             builder: (context) {
                               return AlertDialog(
@@ -165,6 +210,12 @@ class _DecksPageState extends State<DecksPage> {
                           }
                         },
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.share),
+                        onPressed: () {
+                          _shareDeck(deckId, deckName); // Compartir el mazo completo
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -184,44 +235,58 @@ class _DecksPageState extends State<DecksPage> {
                     }
 
                     final cards = snapshot.data!;
-                    return Column(
-                      children: [
-                        ...cards.map((card) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: Container(
-                              decoration: _getCardBackground(card.colors),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: 5,
-                                  color: Colors.white, // Fondo neutro
-                                  child: ListTile(
-                                    title: Text(card.name),
-                                    subtitle: Text(card.type),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.arrow_forward),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => InfoCard(card: card),
-                                          ),
-                                        ).then((_) {
-                                          _loadDecks(); // Recargar los mazos al volver
-                                        });
-                                      },
-                                    ),
+
+                    return ListView.builder(
+                      shrinkWrap: true, // Asegura que la lista ocupe solo el espacio necesario
+                      physics: NeverScrollableScrollPhysics(), // Evita el scroll en el ListView dentro del ExpansionTile
+                      itemCount: cards.length,
+                      itemBuilder: (context, index) {
+                        final card = cards[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Container(
+                            decoration: _getCardBackground(card.colors),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                color: Colors.white, // Fondo neutro
+                                child: ListTile(
+                                  title: Text(card.name),
+                                  subtitle: Text(card.type),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.arrow_forward),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => InfoCard(card: card),
+                                            ),
+                                          ).then((_) {
+                                            _loadDecks(); // Recargar los mazos al volver
+                                          });
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.share),
+                                        onPressed: () {
+                                          _shareCardDetails(card); // Compartir los detalles de la carta
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
-                          );
-                        }),
-                      ],
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -235,13 +300,12 @@ class _DecksPageState extends State<DecksPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CreateDeckPage(),
+              builder: (context) => CreateDeckPage(),
             ),
           ).then((_) {
             _loadDecks(); // Recargar los mazos al volver
           });
         },
-        tooltip: 'Crear nuevo mazo',
         child: const Icon(Icons.add),
       ),
     );

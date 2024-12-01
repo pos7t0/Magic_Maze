@@ -1,11 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/pages/infoCard.dart';
 import 'package:magic_maze/utils/api_helper.dart';
 import 'package:magic_maze/utils/database_helper.dart';
+import 'package:share_plus/share_plus.dart';
 
 class RandomDeckPage extends StatefulWidget {
   const RandomDeckPage({super.key});
@@ -63,6 +62,26 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Mazo guardado con éxito!')),
     );
+  }
+
+  // Función para compartir carta
+  void _shareCard(MagicCard card) {
+    // Crear un texto detallado para compartir
+    final String cardInfo = '''
+Carta: ${card.name}
+Tipo: ${card.type}
+Rareza: ${card.rarity}
+Coste de Maná: ${card.manaCost}
+Colores: ${card.colors.join(', ')}
+Poder: ${card.power}
+Resistencia: ${card.toughness}
+Texto: ${card.text}
+
+Imagen: ${card.imageUrl}
+''';
+
+    // Usar la librería share_plus para compartir
+    Share.share(cardInfo);
   }
 
   Decoration _getCardBackground(List<String> colors) {
@@ -177,24 +196,59 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        card.name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                      // Columna para el nombre y tipo de la carta
+                                      Expanded( // Esto asegura que el texto ocupe el espacio disponible
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              card.name,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                overflow: TextOverflow.ellipsis, // Agrega puntos suspensivos si el texto es muy largo
+                                              ),
+                                              maxLines: 1, // Asegura que el texto no ocupe más de una línea
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              card.type,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        card.type,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
+                                      // Fila para los botones de compartir y ver más
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.share),
+                                            onPressed: () {
+                                              _shareCard(card); // Función de compartir
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.arrow_forward),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      InfoCard(card: card),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
