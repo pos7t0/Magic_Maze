@@ -24,28 +24,36 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
     var connectivityResult = await Connectivity().checkConnectivity();
 
     if (connectivityResult.contains(ConnectivityResult.none)) {
-      setState(() {
-        _noConnection = true;
-      });
+      if (mounted) {
+        setState(() {
+          _noConnection = true;
+        });
+      }
       return; // Salir del método si no hay conexión
     }
 
-    setState(() {
-      _noConnection = false;
-    });
+    if (mounted) {
+      setState(() {
+        _noConnection = false;
+      });
+    }
 
     try {
       const int randomCount = 60; // Cantidad de cartas a obtener
       List<MagicCard> cards =
           await apiHelper.fetchRandomCards(count: randomCount);
 
-      setState(() {
-        _cards = cards;
-      });
+      if (mounted) {
+        setState(() {
+          _cards = cards;
+        });
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar cartas: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar cartas: $e')),
+        );
+      }
     }
   }
 
@@ -201,7 +209,8 @@ Imagen: ${card.imageUrl}
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       // Columna para el nombre y tipo de la carta
-                                      Expanded( // Esto asegura que el texto ocupe el espacio disponible
+                                      Expanded(
+                                        // Esto asegura que el texto ocupe el espacio disponible
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -211,9 +220,11 @@ Imagen: ${card.imageUrl}
                                               style: const TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
-                                                overflow: TextOverflow.ellipsis, // Agrega puntos suspensivos si el texto es muy largo
+                                                overflow: TextOverflow
+                                                    .ellipsis, // Agrega puntos suspensivos si el texto es muy largo
                                               ),
-                                              maxLines: 1, // Asegura que el texto no ocupe más de una línea
+                                              maxLines:
+                                                  1, // Asegura que el texto no ocupe más de una línea
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
@@ -233,11 +244,13 @@ Imagen: ${card.imageUrl}
                                           IconButton(
                                             icon: const Icon(Icons.share),
                                             onPressed: () {
-                                              _shareCard(card); // Función de compartir
+                                              _shareCard(
+                                                  card); // Función de compartir
                                             },
                                           ),
                                           IconButton(
-                                            icon: const Icon(Icons.arrow_forward),
+                                            icon:
+                                                const Icon(Icons.arrow_forward),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
