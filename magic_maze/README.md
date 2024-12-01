@@ -38,9 +38,9 @@ Puedes revisar su documentacion con los siguientes links
 
 caso 1:
 
-1 Clona el repositorio: git clone https://github.com/tu_usuario/team_mokup.git
+1 Clona el repositorio: git clone https://github.com/pos7t0/Magic_Maze
 
-2 Navega al directorio del proyecto: cd team_mokup
+2 Navega al directorio del proyecto: cd magic_maze
 
 3 Instala las dependencias de Flutter: flutter pub get
 
@@ -53,11 +53,6 @@ caso 2:
 2 Toma el archivo Team_Mokup.apk y pásalo a tu celular.
 
 3 Instala el APK en el celular.
-
-## diagramas
-
-ruta de Diagrama de flujo - Registro de una Receta: team_mokup\Diagrama de flujo - Registro de una Receta.png
-ruta de Diagrama de arquitectura de información: team_mokup\Diagrama en arquitectura de información.png
 
 ## video de los desarrolladores
 

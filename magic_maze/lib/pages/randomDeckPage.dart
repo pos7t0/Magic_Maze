@@ -130,15 +130,22 @@ Imagen: ${card.imageUrl}
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Cartas'),
-        backgroundColor: const Color.fromARGB(255, 11, 34, 63),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
+  title: const Text('Random Deck'),
+  backgroundColor: const Color.fromARGB(255, 11, 34, 63),
+  titleTextStyle: const TextStyle(
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  ),
+  iconTheme: const IconThemeData(color: Colors.white),
+  actions: [
+    if (_cards.isNotEmpty)
+      IconButton(
+        icon: const Icon(Icons.save), // Icono del botón de guardar
+        onPressed: _saveDeck,
       ),
+  ],
+),
       backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: _noConnection
           ? Center(
