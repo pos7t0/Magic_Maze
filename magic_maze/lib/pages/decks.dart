@@ -135,7 +135,7 @@ Imagen: ${card.imageUrl}
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Cartas'),
+        title: const Text('Save Deck'),
         backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
         titleTextStyle: const TextStyle(
           color: Colors.white, // Cambia el color del texto del título
@@ -261,6 +261,12 @@ Imagen: ${card.imageUrl}
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
+                                        icon: const Icon(Icons.share),
+                                        onPressed: () {
+                                          _shareCardDetails(card); // Compartir los detalles de la carta
+                                        },
+                                      ),
+                                      IconButton(
                                         icon: const Icon(Icons.arrow_forward),
                                         onPressed: () {
                                           Navigator.push(
@@ -273,12 +279,7 @@ Imagen: ${card.imageUrl}
                                           });
                                         },
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.share),
-                                        onPressed: () {
-                                          _shareCardDetails(card); // Compartir los detalles de la carta
-                                        },
-                                      ),
+                                      
                                     ],
                                   ),
                                 ),
