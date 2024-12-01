@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:magic_maze/models/magic_card.dart';
 import 'package:magic_maze/utils/database_helper.dart';
@@ -50,7 +48,6 @@ class _EditDeckPageState extends State<EditDeckPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nombre del mazo actualizado.')),
       );
-      // Regresar a la página anterior
       Navigator.pop(context);
     }
   }
@@ -106,7 +103,7 @@ class _EditDeckPageState extends State<EditDeckPage> {
       height: 50,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.broken_image, size: 50);
+        return const Icon(Icons.broken_image, size: 50, color: Colors.white);
       },
     );
   }
@@ -115,36 +112,56 @@ class _EditDeckPageState extends State<EditDeckPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Mazo'),
+        title: const Text('Editar Mazo', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(255, 11, 34, 63),
         actions: [
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: const Icon(Icons.save, color: Colors.white),
             onPressed: _updateDeckName,
           ),
         ],
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Campo para editar el nombre del mazo
               TextField(
                 controller: _deckNameController,
-                decoration: const InputDecoration(labelText: 'Nombre del mazo'),
+                style: const TextStyle(color: Colors.white), // Texto en blanco
+                decoration: const InputDecoration(
+                  labelText: 'Nombre del mazo',
+                  labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-              // Campo de búsqueda
               TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(labelText: 'Buscar cartas'),
+                style: const TextStyle(color: Colors.white), // Texto en blanco
+                decoration: const InputDecoration(
+                  labelText: 'Buscar cartas',
+                  labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
                 onChanged: _searchCards,
               ),
               const SizedBox(height: 16),
               if (_isLoading) const CircularProgressIndicator(),
               if (!_isLoading && _searchedCards.isNotEmpty) ...[
-                // Lista de cartas encontradas
-                const Text('Cartas encontradas:'),
+                const Text('Cartas encontradas:', style: TextStyle(color: Colors.white)),
                 SizedBox(
                   height: 200,
                   child: ListView.builder(
@@ -153,10 +170,10 @@ class _EditDeckPageState extends State<EditDeckPage> {
                       final card = _searchedCards[index];
                       return ListTile(
                         leading: _buildCardImage(card.imageUrl),
-                        title: Text(card.name),
-                        subtitle: Text(card.type),
+                        title: Text(card.name, style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(card.type, style: const TextStyle(color: Colors.white)),
                         trailing: IconButton(
-                          icon: const Icon(Icons.add),
+                          icon: const Icon(Icons.add, color: Colors.white),
                           onPressed: () => _addCardToDeck(card),
                         ),
                       );
@@ -165,9 +182,8 @@ class _EditDeckPageState extends State<EditDeckPage> {
                 ),
               ],
               const SizedBox(height: 16),
-              const Divider(), // Separador visual
-              // Lista de cartas en el mazo
-              const Text('Cartas en el mazo:'),
+              const Divider(color: Colors.white), // Separador en blanco
+              const Text('Cartas en el mazo:', style: TextStyle(color: Colors.white)),
               SizedBox(
                 height: 300,
                 child: ListView.builder(
@@ -176,10 +192,10 @@ class _EditDeckPageState extends State<EditDeckPage> {
                     final card = _deckCards[index];
                     return ListTile(
                       leading: _buildCardImage(card.imageUrl),
-                      title: Text(card.name),
-                      subtitle: Text(card.type),
+                      title: Text(card.name, style: const TextStyle(color: Colors.white)),
+                      subtitle: Text(card.type, style: const TextStyle(color: Colors.white)),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete),
+                        icon: const Icon(Icons.delete, color: Colors.white),
                         onPressed: () => _removeCardFromDeck(card),
                       ),
                     );

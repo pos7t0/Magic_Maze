@@ -18,7 +18,6 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   bool _isDeckCreated = false;
   bool _isLoading = false;
   List<MagicCard> _searchedCards = [];
-  // ignore: prefer_final_fields
   List<MagicCard> _selectedCards = [];
   late int _deckId;
 
@@ -41,7 +40,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         _searchedCards = [];
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error al buscar cartas: $e'),
+        content: Text('Error al buscar cartas: $e',),
       ));
     } finally {
       setState(() {
@@ -68,7 +67,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     for (var card in _selectedCards) {
       await _databaseHelper.insertCard(_deckId, card);
     }
-    
+
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Cartas agregadas al mazo!'),
     ));
@@ -83,7 +82,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       height: 50,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.broken_image, size: 50);
+        return const Icon(Icons.broken_image, size: 50, color: Colors.white,);
       },
     );
   }
@@ -92,15 +91,25 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Mazo'),
+        title: const Text('Lista de Cartas', style: TextStyle(color: Colors.white)), // Título en blanco
+        backgroundColor: const Color.fromARGB(255, 11, 34, 63),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
         actions: [
           if (_isDeckCreated)
             IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: _addCardsToDeck, // Acción al presionar el ícono
+              icon: const Icon(Icons.save, color: Colors.white), // Icono en blanco
+              onPressed: _addCardsToDeck,
             ),
         ],
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Color de los iconos en blanco
+        ),
       ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -111,27 +120,45 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                 // Input para el nombre del mazo
                 TextField(
                   controller: _deckNameController,
-                  decoration:
-                      const InputDecoration(labelText: 'Nombre del Mazo'),
+                  style: const TextStyle(color: Colors.white), // Texto en blanco
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del Mazo',
+                    labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white), // Línea de enfoque blanca
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white), // Línea de borde blanca
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _createDeck,
-                  child: const Text('Crear Mazo'),
+                  child: const Text('Crear Mazo'), // Texto en blanco
                 ),
               ] else ...[
                 // Muestra el nombre del mazo creado
                 Text('Mazo: ${_deckNameController.text}',
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                        fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                 const SizedBox(height: 16),
                 // Buscador de cartas con tamaño fijo
                 SizedBox(
                   width: double.infinity,
                   child: TextField(
                     controller: _searchController,
-                    decoration:
-                        const InputDecoration(labelText: 'Buscar Carta'),
+                    style: const TextStyle(color: Colors.white), // Texto en blanco
+                    decoration: const InputDecoration(
+                      labelText: 'Buscar Carta',
+                      labelStyle: TextStyle(color: Colors.white), // Etiqueta en blanco
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white), // Línea de enfoque blanca
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white), // Línea de borde blanca
+                      ),
+                    ),
                     onChanged: (_) => _searchCards(),
                   ),
                 ),
@@ -146,12 +173,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       itemBuilder: (context, index) {
                         final card = _searchedCards[index];
                         return ListTile(
-                          leading: _buildCardImage(
-                              card.imageUrl), // Agrega la imagen de la carta
-                          title: Text(card.name),
-                          subtitle: Text(card.type),
+                          leading: _buildCardImage(card.imageUrl),
+                          title: Text(card.name, style: const TextStyle(color: Colors.white)), // Título en blanco
+                          subtitle: Text(card.type, style: const TextStyle(color: Colors.white)), // Subtítulo en blanco
                           trailing: IconButton(
-                            icon: const Icon(Icons.add),
+                            icon: const Icon(Icons.add, color: Colors.white), // Icono en blanco
                             onPressed: () {
                               setState(() {
                                 _selectedCards.add(card);
@@ -164,8 +190,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                // Cartas Seleccionadas en un espacio scrolleable
-                const Text('Cartas Seleccionadas:'),
+                const Text('Cartas Seleccionadas:', style: TextStyle(color: Colors.white)), // Título en blanco
                 SizedBox(
                   height: 200, // Altura fija para las cartas seleccionadas
                   child: ListView.builder(
@@ -174,10 +199,10 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       final card = _selectedCards[index];
                       return ListTile(
                         leading: _buildCardImage(card.imageUrl),
-                        title: Text(card.name),
-                        subtitle: Text(card.type),
+                        title: Text(card.name, style: const TextStyle(color: Colors.white)), // Título en blanco
+                        subtitle: Text(card.type, style: const TextStyle(color: Colors.white)), // Subtítulo en blanco
                         trailing: IconButton(
-                          icon: const Icon(Icons.remove),
+                          icon: const Icon(Icons.remove, color: Colors.white), // Icono en blanco
                           onPressed: () {
                             setState(() {
                               _selectedCards.remove(card);

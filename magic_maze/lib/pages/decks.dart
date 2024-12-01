@@ -42,12 +42,63 @@ class _DecksPageState extends State<DecksPage> {
     _loadDecks(); // Recargar la lista de mazos
   }
 
+  // Función para crear el fondo con colores
+  Decoration _getCardBackground(List<String> colors) {
+    if (colors.isEmpty) {
+      return const BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      );
+    }
+
+    if (colors.length == 1) {
+      return BoxDecoration(
+        color: _getColor(colors[0]),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      );
+    }
+
+    return BoxDecoration(
+      gradient: LinearGradient(
+        colors: colors.map(_getColor).toList(),
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderRadius: const BorderRadius.all(Radius.circular(10)),
+    );
+  }
+
+  // Función para mapear los colores
+  Color _getColor(String colorInitial) {
+    switch (colorInitial.toLowerCase()) {
+      case 'w':
+        return const Color.fromARGB(255, 255, 255, 185);
+      case 'u':
+        return Colors.blue;
+      case 'b':
+        return Colors.black;
+      case 'r':
+        return Colors.red;
+      case 'g':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mazos'),
+        title: const Text('Lista de Cartas'),
+        backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
+        titleTextStyle: const TextStyle(
+          color: Colors.white, // Cambia el color del texto del título
+          fontSize: 20,        // Opcional: Ajusta el tamaño de la fuente
+          fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
+        ),
       ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),  
       body: ListView.builder(
         itemCount: _decks.length,
         itemBuilder: (context, index) {
@@ -136,25 +187,36 @@ class _DecksPageState extends State<DecksPage> {
                     return Column(
                       children: [
                         ...cards.map((card) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 8),
-                            child: ListTile(
-                              title: Text(card.name),
-                              subtitle: Text(card.type),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.arrow_forward),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          InfoCard(card: card),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Container(
+                              decoration: _getCardBackground(card.colors),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  color: Colors.white, // Fondo neutro
+                                  child: ListTile(
+                                    title: Text(card.name),
+                                    subtitle: Text(card.type),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.arrow_forward),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => InfoCard(card: card),
+                                          ),
+                                        ).then((_) {
+                                          _loadDecks(); // Recargar los mazos al volver
+                                        });
+                                      },
                                     ),
-                                  ).then((_) {
-                                    _loadDecks(); // Recargar los mazos al volver
-                                  });
-                                },
+                                  ),
+                                ),
                               ),
                             ),
                           );

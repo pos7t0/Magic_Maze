@@ -52,8 +52,23 @@ class InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(card.name),
+        title: FittedBox( // Usamos FittedBox para ajustar el texto al espacio
+          child: Text(
+            card.name,
+            overflow: TextOverflow.ellipsis, // Esto asegura que el texto no se desborde
+            style: const TextStyle(
+              color: Colors.white, // Color del texto del título
+              fontSize: 20,        // Tamaño de la fuente
+              fontWeight: FontWeight.bold, // Grosor del texto
+            ),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Cambia el color de la flecha a blanco
+        ),
       ),
+      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
