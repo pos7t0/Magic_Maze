@@ -93,4 +93,45 @@ class DatabaseHelper {
 
     return result.map((json) => MagicCard.fromJson(json)).toList();
   }
+
+  // Actualizar el nombre del mazo
+  Future<int> updateDeckName(int deckId, String newName) async {
+    final db = await database;
+    return await db.update(
+      tableDecks,
+      {'name': newName},
+      where: 'id = ?',
+      whereArgs: [deckId],
+    );
+  }
+
+// Eliminar una carta del mazo
+  Future<int> removeCardFromDeck(int deckId, String cardId) async {
+    final db = await database;
+    return await db.delete(
+      tableCards,
+      where: 'deckId = ? AND cardId = ?',
+      whereArgs: [deckId, cardId],
+    );
+  }
+
+  // Eliminar todas las cartas asociadas a un mazo
+  Future<void> removeCardsFromDeck(int deckId) async {
+    final db = await database;
+    await db.delete(
+      tableCards,
+      where: 'deckId = ?',
+      whereArgs: [deckId],
+    );
+  }
+
+// Eliminar un mazo
+  Future<int> removeDeck(int deckId) async {
+    final db = await database;
+    return await db.delete(
+      tableDecks,
+      where: 'id = ?',
+      whereArgs: [deckId],
+    );
+  }
 }

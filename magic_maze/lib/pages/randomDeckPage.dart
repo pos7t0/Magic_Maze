@@ -20,7 +20,8 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   void _fetchRandomCards() async {
     try {
       const int randomCount = 60;
-      List<MagicCard> cards = await apiHelper.fetchRandomCards(count: randomCount);
+      List<MagicCard> cards =
+          await apiHelper.fetchRandomCards(count: randomCount);
       setState(() {
         _cards = cards;
       });
@@ -42,7 +43,7 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mazo guardado con éxito!')),
+      const SnackBar(content: Text('Mazo guardado con Ã©xito!')),
     );
   }
 
@@ -91,16 +92,9 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  appBar: AppBar(
-    title: const Text('Lista de Cartas'),
-    backgroundColor: const Color.fromARGB(255, 11, 34, 63), // Color de fondo
-    titleTextStyle: const TextStyle(
-      color: Colors.white, // Cambia el color del texto del título
-      fontSize: 20,        // Opcional: Ajusta el tamaño de la fuente
-      fontWeight: FontWeight.bold, // Opcional: Ajusta el grosor del texto
-    ),
-  ),
-      backgroundColor: const Color.fromARGB(255, 15, 50, 92),
+      appBar: AppBar(
+        title: const Text('Lista de Cartas'),
+      ),
       body: Stack(
         children: [
           if (_cards.isNotEmpty)
@@ -110,7 +104,8 @@ class _RandomDeckPageState extends State<RandomDeckPage> {
               itemBuilder: (context, index) {
                 var card = _cards[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Container(
                     decoration: _getCardBackground(card.colors),
                     child: Padding(
